@@ -25,9 +25,11 @@ class BigramModel(object):
 
         return sen
 
-    def generate_sentence_with_number(self):
-        sen = self.generate_sentence()
-        return sen + "\t" + str(random.randInt())
+    def generate_number_suffix(self):
+        return "\t" + str(random.randint(0, 242))
+
+    def generate_sentence_with_suffix(self):
+        return " ".join(self.generate_sentence()[1:-1]) + self.generate_number_suffix()
 
     def get_sentence_probability(self, sen):
         prob = 1.
@@ -90,6 +92,12 @@ class BigramDist:
                     return word
 
 if __name__ == "__main__":
+    random.seed(0)
     corpus = GrimReaper.build_corpus_from_file("", FILE_NAME)
     bigram = BigramModel(corpus)
-    print bigram.generate_sentence()
+    print bigram.generate_sentence_with_suffix()
+    print bigram.generate_sentence_with_suffix()
+    print bigram.generate_sentence_with_suffix()
+    print bigram.generate_sentence_with_suffix()
+    print bigram.generate_sentence_with_suffix()
+    print bigram.generate_sentence_with_suffix()
