@@ -4,10 +4,9 @@ from __future__ import division
 import random, math
 from operator import itemgetter
 from collections import defaultdict
+from GrimReaper import *
 
 # Constants
-START_SYMBOL = "<s>"
-END_SYMBOL   = "</s>"
 FILE_NAME    = "movies.txt"
 
 # Unsmoothed bigram language model
@@ -17,20 +16,24 @@ class BigramModel(object):
 
     def generate_sentence(self):
         sen = []
-        sen.append(start)
+        sen.append(START_SYMBOL)
 
-        while sen[-1] != end:
+        while sen[-1] != END_SYMBOL:
             drawn = self.bigramDist.draw(sen[-1])
-            if drawn != start:
+            if drawn != START_SYMBOL:
                 sen.append(drawn)
 
         return sen
+
+    def generate_sentence_with_number(self):
+        sen = self.generate_sentence()
+        return sen + "\t" + str(random.randInt())
 
     def get_sentence_probability(self, sen):
         prob = 1.
         prev = ""
         for word in sen:
-            if word != start:
+            if word != START_SYMBOL:
                 prob *= self.bigramDist.prob(word, prev)
             prev = word
 
@@ -86,6 +89,7 @@ class BigramDist:
                 if rand <= 0.0:
                     return word
 
-if __name__ == "main":
-    corpus = GrimReaper.build_corpus_file("", FILE_NAME)
-    print corpus
+if __name__ == "__main__":
+    corpus = GrimReaper.build_corpus_from_file("", FILE_NAME)
+    bigram = BigramModel(corpus)
+    print bigram.generate_sentence()

@@ -1,9 +1,15 @@
 #!/usr/bin/python
 import os, sys, errno, string
 
-valid_chars = "-_.() %s%s" % (string.ascii_letters, string.digits)
+#Constants
+VALID_CHARS  = "-_.() %s%s" % (string.ascii_letters, string.digits)
+START_SYMBOL = "<s>"
+END_SYMBOL   = "</s>"
 
 class GrimReaper(object):
+    """
+    GrimReaper is master of your corpus.
+    """
 
     # Tries to make path and only catches exceptions not relating to directory
     # already existing.
@@ -22,7 +28,7 @@ class GrimReaper(object):
 
     @staticmethod
     def scrub_file_name(filename):
-        return "".join(c for c in filename if c in valid_chars).encode('utf-8')
+        return "".join(c for c in filename if c in VALID_CHARS).encode('utf-8')
 
     @staticmethod
     def write_to_file(path, filename, data):
@@ -51,13 +57,24 @@ class GrimReaper(object):
         return data
 
     @staticmethod
+    def preprocess_corpus(corpus):
+        """
+        Prepend start symbol and appends end symbol to each line.
+        """
+        for sen in corpus:
+            sen.insert(0, START_SYMBOL)
+            sen.append(END_SYMBOL)
+        return corpus
+
+    @staticmethod
     def build_corpus_from_file(path, filename):
         """
         Builds a corpus from a specified file and returns the corpus, which is a
-        list of lists of lists. Each sentences is split into its constituent
+        list of lists. Each sentences is split into its constituent
         series of words.
         Input: pre-processed file.
-        Output: list of lists of lists.
+        Output: list of lists.
         """
         data = GrimReaper.read_from_file(path, filename)
-        return [line.split() for line in data]
+        corpus = [line.split() for line in data]
+        return GrimReaper.preprocess_corpus(corpus)
