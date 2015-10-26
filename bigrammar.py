@@ -7,45 +7,23 @@ from collections import defaultdict
 from GrimReaper import *
 
 # Constants
-FILE_NAME    = "movies.txt"
+FILE_NAME = "movies.txt"
 
-# Unsmoothed bigram language model
 class BigramModel(object):
+    """
+    Unsmoothed Bigram Language model.
+    """
     def __init__(self, corpus):
         self.bigram_dist = BigramDist(corpus)
 
-    def generate_sentence(self):
-        sen = []
-        sen.append(START_SYMBOL)
-
-        while sen[-1] != END_SYMBOL:
-            drawn = self.bigram_dist.draw(sen[-1])
-            if drawn != START_SYMBOL:
-                sen.append(drawn)
-
-        return sen
-
     def generate_number_suffix(self):
         return "\t" + str(random.randint(0, 242))
-
-    def generate_sentence_with_suffix(self):
-        return " ".join(self.generate_sentence()[1:-1]) + self.generate_number_suffix()
 
     def generate_bigram(self):
         return self.bigram_dist.draw_bigram()
 
     def generate_bigram_with_suffix(self):
         return self.bigram_dist.draw_bigram() + str(self.generate_number_suffix())
-
-    def get_sentence_probability(self, sen):
-        prob = 1.
-        prev = ""
-        for word in sen:
-            if word != START_SYMBOL:
-                prob *= self.bigram_dist.prob(word, prev)
-            prev = word
-
-        return prob
 
 # Class for a unsmoothed bigram probability distribution
 class BigramDist:
@@ -67,7 +45,7 @@ class BigramDist:
                 prev_word = word
 
         self.prev_length = len(self.prev_counts)
-        print "Done training"
+        print "Done training."
 
     # Returns the probability of word in the distribution
     def prob(self, word, given):
@@ -103,11 +81,12 @@ if __name__ == "__main__":
     KB = B*B
     MB = KB*B
     GB = MB*B
-    file_size = 10*KB
-    output_name = "soof.txt"
-    interval = 10000
+    file_size = 70*MB
+    output_name = "gabby.txt"
+    interval = MB
     # Ain't no do while in python
     GrimReaper.write_to_file("data", output_name, [bigram.generate_bigram_with_suffix() for i in xrange(interval)])
     while GrimReaper.get_file_size("data", output_name)*B < file_size:
         print GrimReaper.get_file_size("data", output_name)
         GrimReaper.write_to_file("data", output_name, [bigram.generate_bigram_with_suffix() for i in xrange(interval)])
+        print "Onto the next one..."
