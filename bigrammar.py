@@ -12,14 +12,14 @@ FILE_NAME    = "movies.txt"
 # Unsmoothed bigram language model
 class BigramModel(object):
     def __init__(self, corpus):
-        self.bigramDist = BigramDist(corpus)
+        self.bigram_dist = BigramDist(corpus)
 
     def generate_sentence(self):
         sen = []
         sen.append(START_SYMBOL)
 
         while sen[-1] != END_SYMBOL:
-            drawn = self.bigramDist.draw(sen[-1])
+            drawn = self.bigram_dist.draw(sen[-1])
             if drawn != START_SYMBOL:
                 sen.append(drawn)
 
@@ -31,38 +31,25 @@ class BigramModel(object):
     def generate_sentence_with_suffix(self):
         return " ".join(self.generate_sentence()[1:-1]) + self.generate_number_suffix()
 
+    def generate_bigram(self):
+        return self.bigram_dist.draw_bigram()
+
     def get_sentence_probability(self, sen):
         prob = 1.
         prev = ""
         for word in sen:
             if word != START_SYMBOL:
-                prob *= self.bigramDist.prob(word, prev)
+                prob *= self.bigram_dist.prob(word, prev)
             prev = word
 
         return prob
 
-    def get_corpus_perplexity(self, corpus):
-        corpus_length = 0
-        log_total     = 0
-
-        for sen in corpus:
-            prev = sen[0]
-            for word in sen[1:]:
-                corpus_length += 1
-                p = self.bigramDist.prob(word, prev)
-                if p != 0:
-                    log_total += math.log(p)
-                else:
-                    return float('Inf')
-                prev = word
-
-        return math.exp(-log_total/corpus_length)
-
 # Class for a unsmoothed bigram probability distribution
 class BigramDist:
     def __init__(self, corpus):
-        self.counts = defaultdict(lambda: defaultdict(float))
-        self.total = defaultdict(float)
+        self.counts       = defaultdict(lambda: defaultdict(float))
+        self.total        = defaultdict(float)
+        self.start_length = 0
         self.train(corpus)
 
     # Add observed counts from corpus to the distribution
@@ -74,11 +61,15 @@ class BigramDist:
                 self.counts[prev_word][word] += 1.0
                 self.total[word] += 1.0
                 prev_word = word
+        self.start_length = len(self.total)
 
     # Returns the probability of word in the distribution
     def prob(self, word, given):
         ret = self.counts[given][word] / self.total[given]
         return ret
+
+    def draw_start(self):
+        return self.total.keys()[random.randint(0, self.start_length)]
 
     # Generate a single random word according to the distribution
     def draw(self, prev):
@@ -91,13 +82,22 @@ class BigramDist:
                 if rand <= 0.0:
                     return word
 
+    def draw_bigram(self):
+        prev = self.draw_start()
+        return prev + " " + self.draw(prev)
+
 if __name__ == "__main__":
     random.seed(0)
     corpus = GrimReaper.build_corpus_from_file("", FILE_NAME)
     bigram = BigramModel(corpus)
-    print bigram.generate_sentence_with_suffix()
-    print bigram.generate_sentence_with_suffix()
-    print bigram.generate_sentence_with_suffix()
-    print bigram.generate_sentence_with_suffix()
-    print bigram.generate_sentence_with_suffix()
-    print bigram.generate_sentence_with_suffix()
+    B = 1024
+    KB = B*B
+    MB = KB*B
+    GB = MB*B
+    file_size = 10*KB
+    # TODO: actually control file size
+    output_name = "soof.txt"
+    interval = 1000
+    while file_size > 0:
+        GrimReaper.write_to_file("", output_name, [bigram.generate_bigram() for i in xrange(interval)])
+        file_size -= interval

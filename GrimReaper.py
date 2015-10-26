@@ -37,7 +37,7 @@ class GrimReaper(object):
         data      = data.encode('utf-8')
         full_path = os.path.join(path, filename)
 
-        with open(full_path, "wb") as file_target:
+        with open(full_path, "ab") as file_target:
             if type(data) is list:
                 for line in data:
                     file_target.write(line + "\n")
