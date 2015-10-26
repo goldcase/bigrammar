@@ -66,8 +66,10 @@ class GrimReaper(object):
         ret = []
         for sen in corpus:
             temp = [x for x in sen if x not in INVALID_ELEMS]
-            if temp:
-                ret.append(temp)
+            if not temp:
+                continue
+            temp.append(END_SYMBOL)
+            ret.append(temp)
 
         return ret
 

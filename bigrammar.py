@@ -85,8 +85,10 @@ class BigramDist:
                 rand -= p
                 if rand <= 0.0:
                     ret = word
-                    break
-            return ret
+        if ret == END_SYMBOL:
+            ret = self.draw_start()
+
+        return ret
 
     def draw_bigram(self):
         prev = self.draw_start()
