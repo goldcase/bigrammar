@@ -85,3 +85,10 @@ class GrimReaper(object):
         data = GrimReaper.read_from_file(path, filename)
         corpus = [line.split() for line in data]
         return GrimReaper.preprocess_corpus(corpus)
+
+    @staticmethod
+    def get_file_size(path, filename):
+        """
+        Gets file size of the specified file.
+        """
+        return os.stat(os.path.join(path, filename)).st_size

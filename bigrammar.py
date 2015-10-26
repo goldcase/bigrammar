@@ -67,6 +67,7 @@ class BigramDist:
                 prev_word = word
 
         self.prev_length = len(self.prev_counts)
+        print "Done training"
 
     # Returns the probability of word in the distribution
     def prob(self, word, given):
@@ -102,10 +103,11 @@ if __name__ == "__main__":
     KB = B*B
     MB = KB*B
     GB = MB*B
-    file_size = 10*B
-    # TODO: actually control file size
+    file_size = 10*KB
     output_name = "soof.txt"
-    interval = 1000
-    while file_size > 0:
+    interval = 10000
+    # Ain't no do while in python
+    GrimReaper.write_to_file("data", output_name, [bigram.generate_bigram_with_suffix() for i in xrange(interval)])
+    while GrimReaper.get_file_size("data", output_name)*B < file_size:
+        print GrimReaper.get_file_size("data", output_name)
         GrimReaper.write_to_file("data", output_name, [bigram.generate_bigram_with_suffix() for i in xrange(interval)])
-        file_size -= interval
