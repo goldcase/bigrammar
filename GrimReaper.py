@@ -2,9 +2,10 @@
 import os, sys, errno, string
 
 #Constants
-VALID_CHARS  = "-_.() %s%s" % (string.ascii_letters, string.digits)
-START_SYMBOL = "<s>"
-END_SYMBOL   = "</s>"
+VALID_CHARS   = "%s%s" % (string.ascii_letters, string.digits)
+INVALID_ELEMS = list(string.punctuation)
+START_SYMBOL  = "<s>"
+END_SYMBOL    = "</s>"
 
 class GrimReaper(object):
     """
@@ -33,15 +34,16 @@ class GrimReaper(object):
     @staticmethod
     def write_to_file(path, filename, data):
         # Recursively create path passed as arg.
-        make_path(path)
-        data      = data.encode('utf-8')
+        GrimReaper.make_path(path)
         full_path = os.path.join(path, filename)
 
         with open(full_path, "ab") as file_target:
             if type(data) is list:
                 for line in data:
+                    line = line.encode('utf-8')
                     file_target.write(line + "\n")
             else:
+                data = data.encode('utf-8')
                 file_target.write(data)
 
     @staticmethod
@@ -59,12 +61,15 @@ class GrimReaper(object):
     @staticmethod
     def preprocess_corpus(corpus):
         """
-        Prepend start symbol and appends end symbol to each line.
+        Remove invalid elems (like punctuation) from the corpus.
         """
+        ret = []
         for sen in corpus:
-            sen.insert(0, START_SYMBOL)
-            sen.append(END_SYMBOL)
-        return corpus
+            temp = [x for x in sen if x not in INVALID_ELEMS]
+            if temp:
+                ret.append(temp)
+
+        return ret
 
     @staticmethod
     def build_corpus_from_file(path, filename):
