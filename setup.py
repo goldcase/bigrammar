@@ -14,5 +14,5 @@ exts = [Extension("draw", ["draw.pyx"],)]
 
 setup(
     cmdclass = {'build_ext': build_ext},
-    ext_modules = exts,
+    ext_modules = exts
 )

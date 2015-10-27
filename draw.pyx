@@ -1,9 +1,10 @@
-import random
+#import random
+from libc.stdlib cimport rand
 
 # TODO: This is probably the wrong way to generate random numbers
 # in cython:
 # http://stackoverflow.com/questions/16138090/correct-way-to-generate-random-numbers-in-cython
-def cdraw(counts, prob, prev):
+def cdraw(counts, prob, str prev):
     """
     TODO: Figure out how to actually use strings in cython...
     http://docs.cython.org/src/tutorial/strings.html
@@ -17,13 +18,13 @@ def cdraw(counts, prob, prev):
         Counts for words, given prev as a prior. (Prev has already
         been determined.)
     """
-    ret = "</s>"
-    cdef float rand = random.random()
-    cdef float p
+    cdef str ret = "</s>"
+    cdef float rand_num = rand()
+    cdef float p = 0
     for word in counts.iterkeys():
         p = prob(word, prev)
-        rand -= p
-        if rand <= 0.0:
+        rand_num -= p
+        if rand_num <= 0.0:
             ret = word
             break
     return ret
