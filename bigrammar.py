@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 
 from __future__ import division
 import random, math
@@ -31,7 +31,12 @@ class BigramDist:
         self.counts      = defaultdict(lambda: defaultdict(float))
         self.prev_counts = defaultdict(float)
         self.prev_length = 0.0
+        from time import time
+        start = time()
         self.train(corpus)
+        total_time = time() - start
+        print "Took {0} seconds to train".format(round(total_time, 2))
+
 
     # Add observed counts from corpus to the distribution
     def train(self, corpus):
@@ -59,11 +64,12 @@ class BigramDist:
         ret = END_SYMBOL
         if prev != None:
             rand = random.random()
-            for word in self.counts[prev].keys():
+            for word in self.counts[prev].iterkeys():
                 p = self.prob(word, prev)
                 rand -= p
                 if rand <= 0.0:
                     ret = word
+                    break
         if ret == END_SYMBOL:
             ret = self.draw_start()
 
@@ -85,7 +91,16 @@ if __name__ == "__main__":
     output_name = "gabby.txt"
     interval = MB
     # Ain't no do while in python
-    GrimReaper.write_to_file("data", output_name, [bigram.generate_bigram_with_suffix() for i in xrange(interval)])
+    from time import time
+    start = time()
+    somelist = list()
+    for i in xrange(interval):
+        somelist.append(bigram.generate_bigram_with_suffix())
+        if i % 10000 == 0:
+            print "Took {0} seconds to generate 10000 bigrams".format(time() - start)
+
+    GrimReaper.write_to_file("data", output_name, somelist)
+    print "Time to execute: {0}".format(time() - start)
     while GrimReaper.get_file_size("data", output_name)*B < file_size:
         print GrimReaper.get_file_size("data", output_name)
         GrimReaper.write_to_file("data", output_name, [bigram.generate_bigram_with_suffix() for i in xrange(interval)])
