@@ -20,7 +20,7 @@ def cdraw(counts, prob, prev):
     ret = "</s>"
     cdef float rand = random.random()
     cdef float p
-    for word in counts.keys():
+    for word in counts.iterkeys():
         p = prob(word, prev)
         rand -= p
         if rand <= 0.0:
