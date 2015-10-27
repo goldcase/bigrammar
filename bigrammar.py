@@ -5,6 +5,7 @@ import random, math
 from operator import itemgetter
 from collections import defaultdict
 from GrimReaper import *
+from draw import cdraw
 
 # Constants
 FILE_NAME = "movies.txt"
@@ -35,8 +36,7 @@ class BigramDist:
         start = time()
         self.train(corpus)
         total_time = time() - start
-        print "Took {0} seconds to execute".format(round(total_time, 2))
-        sys.exit(0)
+        print "Took {0} seconds to train".format(round(total_time, 2))
 
 
     # Add observed counts from corpus to the distribution
@@ -64,12 +64,15 @@ class BigramDist:
     def draw(self, prev):
         ret = END_SYMBOL
         if prev != None:
+            ret = cdraw(self.counts[prev], self.prob, prev)
+            """
             rand = random.random()
             for word in self.counts[prev].keys():
                 p = self.prob(word, prev)
                 rand -= p
                 if rand <= 0.0:
                     ret = word
+            """
         if ret == END_SYMBOL:
             ret = self.draw_start()
 
