@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 
 from __future__ import division
 import random, math
@@ -31,7 +31,13 @@ class BigramDist:
         self.counts      = defaultdict(lambda: defaultdict(float))
         self.prev_counts = defaultdict(float)
         self.prev_length = 0.0
+        from time import time
+        start = time()
         self.train(corpus)
+        total_time = time() - start
+        print "Took {0} seconds to execute".format(round(total_time, 2))
+        sys.exit(0)
+
 
     # Add observed counts from corpus to the distribution
     def train(self, corpus):
